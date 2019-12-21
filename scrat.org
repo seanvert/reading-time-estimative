@@ -1,7 +1,9 @@
 * reading time estimative
-** ☛ TODO colocar os domínios das funções
-** ☛ TODO arrumar as docstrings
-** ☛ TODO colocar um esquema para marcar com o org-noter
+** o que está faltando
+*** ☛ TODO colocar os domínios das funções
+*** ☛ TODO arrumar as docstrings
+*** ☛ TODO colocar um esquema para marcar com o org-noter
+*** ☛ TODO ajeitar o tangle
 
 ** variáveis capítulos
 #+begin_src emacs-lisp 
