@@ -88,26 +88,26 @@
 #+end_src
 
 #+RESULTS:
-| Chapter 1 - Introduction To Cognitive Behavior Therapy      |  23 |
-| Chapter 2 - Overview Of Treatment                           |  39 |
-| Chapter 3 - Cognitive Conceptualization                     |  51 |
-| Chapter 4 - The Evaluation Session                          |  68 |
-| Chapter 5 - Structure Of The First Therapy Session          |  81 |
-| Chapter 6 - Behavioral Activation                           | 102 |
-| Chapter 7 - Session 2 And Beyond: Structure And Format      | 122 |
-| Chapter 8 - Problems With Structuring The Therapy Session   | 145 |
-| Chapter 9 - Identifying Automatic Thoughts                  | 159 |
-| Chapter 10 - Identifying Emotions                           | 180 |
-| Chapter 11 - Evaluating Automatic Thoughts                  | 189 |
-| Chapter 12 - Responding To Automatic Thoughts               | 209 |
+| Chapter 1 - Introduction To Cognitive Behavior Therapy	  |	 23 |
+| Chapter 2 - Overview Of Treatment							  |	 39 |
+| Chapter 3 - Cognitive Conceptualization					  |	 51 |
+| Chapter 4 - The Evaluation Session						  |	 68 |
+| Chapter 5 - Structure Of The First Therapy Session		  |	 81 |
+| Chapter 6 - Behavioral Activation							  | 102 |
+| Chapter 7 - Session 2 And Beyond: Structure And Format	  | 122 |
+| Chapter 8 - Problems With Structuring The Therapy Session	  | 145 |
+| Chapter 9 - Identifying Automatic Thoughts				  | 159 |
+| Chapter 10 - Identifying Emotions							  | 180 |
+| Chapter 11 - Evaluating Automatic Thoughts				  | 189 |
+| Chapter 12 - Responding To Automatic Thoughts				  | 209 |
 | Chapter 13 - Identifying And Modifying Intermediate Beliefs | 220 |
-| Chapter 14 - Identifying And Modifying Core Beliefs         | 250 |
+| Chapter 14 - Identifying And Modifying Core Beliefs		  | 250 |
 | Chapter 15 - Additional Cognitive And Behavioral Techniques | 278 |
-| Chapter 16 - Imagery                                        | 299 |
-| Chapter 17 - Homework                                       | 316 |
-| Chapter 18 - Termination And Relapse Prevention             | 338 |
-| Chapter 19 - Treatment Planning                             | 354 |
-| Chapter 20 - Problems In Therapy                            | 368 |
+| Chapter 16 - Imagery										  | 299 |
+| Chapter 17 - Homework										  | 316 |
+| Chapter 18 - Termination And Relapse Prevention			  | 338 |
+| Chapter 19 - Treatment Planning							  | 354 |
+| Chapter 20 - Problems In Therapy							  | 368 |
 | Chapter 21 - Progressing As A Cognitive Behavior Therapist  | 380 |
 
 ** pega o total de páginas por capítulo
@@ -132,40 +132,43 @@
 
 *** seq
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (setq outlinedois (reverse (get-total-per-chapter outlineum '())))
 #+end_src
 
 #+RESULTS:
-| Chapter 1 - Introduction To Cognitive Behavior Therapy      | 16 |
-| Chapter 2 - Overview Of Treatment                           | 12 |
-| Chapter 3 - Cognitive Conceptualization                     | 17 |
-| Chapter 4 - The Evaluation Session                          | 13 |
-| Chapter 5 - Structure Of The First Therapy Session          | 21 |
-| Chapter 6 - Behavioral Activation                           | 20 |
-| Chapter 7 - Session 2 And Beyond: Structure And Format      | 23 |
-| Chapter 8 - Problems With Structuring The Therapy Session   | 14 |
-| Chapter 9 - Identifying Automatic Thoughts                  | 21 |
-| Chapter 10 - Identifying Emotions                           |  9 |
-| Chapter 11 - Evaluating Automatic Thoughts                  | 20 |
-| Chapter 12 - Responding To Automatic Thoughts               | 11 |
+| Chapter 1 - Introduction To Cognitive Behavior Therapy	  | 16 |
+| Chapter 2 - Overview Of Treatment							  | 12 |
+| Chapter 3 - Cognitive Conceptualization					  | 17 |
+| Chapter 4 - The Evaluation Session						  | 13 |
+| Chapter 5 - Structure Of The First Therapy Session		  | 21 |
+| Chapter 6 - Behavioral Activation							  | 20 |
+| Chapter 7 - Session 2 And Beyond: Structure And Format	  | 23 |
+| Chapter 8 - Problems With Structuring The Therapy Session	  | 14 |
+| Chapter 9 - Identifying Automatic Thoughts				  | 21 |
+| Chapter 10 - Identifying Emotions							  |	 9 |
+| Chapter 11 - Evaluating Automatic Thoughts				  | 20 |
+| Chapter 12 - Responding To Automatic Thoughts				  | 11 |
 | Chapter 13 - Identifying And Modifying Intermediate Beliefs | 30 |
-| Chapter 14 - Identifying And Modifying Core Beliefs         | 28 |
+| Chapter 14 - Identifying And Modifying Core Beliefs		  | 28 |
 | Chapter 15 - Additional Cognitive And Behavioral Techniques | 21 |
-| Chapter 16 - Imagery                                        | 17 |
-| Chapter 17 - Homework                                       | 22 |
-| Chapter 18 - Termination And Relapse Prevention             | 16 |
-| Chapter 19 - Treatment Planning                             | 14 |
-| Chapter 20 - Problems In Therapy                            | 12 |
+| Chapter 16 - Imagery										  | 17 |
+| Chapter 17 - Homework										  | 22 |
+| Chapter 18 - Termination And Relapse Prevention			  | 16 |
+| Chapter 19 - Treatment Planning							  | 14 |
+| Chapter 20 - Problems In Therapy							  | 12 |
 | Chapter 21 - Progressing As A Cognitive Behavior Therapist  | 34 |
 
 ** PRA FAZER pega o tempo das coisas
+ver algo para checar se o buffer/janela ainda estão ativos conforme se
+adiciona o tempo.
 #+begin_src emacs-lisp
 ;TODO: colocar um hook pra quando abrir o arquivo pdf ele pegar o tempo
 (add-hook 'pdf-view-mode-hook #'set-pdf-time-before)
 
 (defun set-pdf-time-before ()
-  (setq pdf-time-before (current-time)))
+  (setq pdf-time-before (current-time)
+		pdf-current-page (pdf-view-current-page)))
 
 (setq threshold 6)
 
@@ -175,13 +178,11 @@
 
 (setq page-rate 1)
 
-(length pdf-time-pages)
-
 (defun pdf-check-page-advance ()
   (interactive)
-  "checks if we are going forward on non-read pages"
-;;  TODO vai bugar, depois preciso ver alguma solução melhor pra isso
-  (add-to-list 'pdf-time-pages (1- (pdf-view-current-page))))
+  "checks if we are going forward on non-read pages or backwards"
+  (if (> (pdf-view-current-page) pdf-current-page)
+	  (add-to-list 'pdf-time-pages (1- (pdf-view-current-page)))))
 
 (defun testesss ()
   (let ((seconds-in-previous-page (time-to-seconds (time-subtract (current-time) pdf-time-before))))
@@ -190,11 +191,9 @@
 					  (setq total-time (+ total-time seconds-in-previous-page)
 							page-rate (/ total-time (length pdf-time-pages)))
 					  (message (format "%f total time and %f average page time" total-time page-rate))))
-		   (setq pdf-time-before (current-time)))))
+		   (set-pdf-time-before))))
 
 (add-hook 'pdf-view-after-change-page-hook #'testesss)
-
-;; TODO uma função que checa se avançamos nas páginas
 
 ;; TODO uma outra função que estima o tempo final
 ;; TODO uma função que pega a última página como algo arbitrário para remover índices no final
@@ -210,7 +209,8 @@
   "Function that gets the OUTLINE rate and apply it to the time."
   (list (car outline)
 		(* page-rate (car (cdr outline)))))
-
-(mapcar #'get-chapters-time outlinedois)
 #+end_src
 
+#+begin_src emacs-lisp :tangle no
+(mapcar #'get-chapters-time outlinedois)
+#+end_src

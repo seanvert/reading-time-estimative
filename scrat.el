@@ -45,7 +45,7 @@
 										  (car (cdr (car outl))))) ;; first element page number
 								 acc))))
 
-(setq outlinedois (reverse (get-total-per-chapter outlineum '())))
+;; (setq outlinedois (reverse (get-total-per-chapter outlineum '())))
 
 ;TODO: colocar um hook pra quando abrir o arquivo pdf ele pegar o tempo
 (add-hook 'pdf-view-mode-hook #'set-pdf-time-before)
@@ -66,7 +66,7 @@
 (defun pdf-check-page-advance ()
   (interactive)
   "checks if we are going forward on non-read pages"
-;;  TODO vai bugar, depois preciso ver alguma solução melhor pra isso
+;;	TODO vai bugar, depois preciso ver alguma solução melhor pra isso
   (add-to-list 'pdf-time-pages (1- (pdf-view-current-page))))
 
 (defun testesss ()
@@ -76,7 +76,7 @@
 					  (setq total-time (+ total-time seconds-in-previous-page)
 							page-rate (/ total-time (length pdf-time-pages)))
 					  (message (format "%f total time and %f average page time" total-time page-rate))))
-		   (setq pdf-time-before (current-time)))))
+		   (set-pdf-time-before))))
 
 (add-hook 'pdf-view-after-change-page-hook #'testesss)
 
@@ -90,4 +90,4 @@
   (list (car outline)
 		(* page-rate (car (cdr outline)))))
 
-(mapcar #'get-chapters-time outlinedois)
+;; (mapcar #'get-chapters-time outlinedois)
