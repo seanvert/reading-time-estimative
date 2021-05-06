@@ -1,12 +1,11 @@
 * reading time estimative
+#+PROPERTY: header-args :tangle scrat.el
 ** o que está faltando
-*** ☛ TODO colocar os domínios das funções
-*** ☛ TODO arrumar as docstrings
-*** ☛ TODO colocar um esquema para marcar com o org-noter
-*** ☛ TODO ajeitar o tangle
-
+*** colocar os domínios das funções
+*** arrumar as docstrings
+*** colocar um esquema para marcar com o org-noter
 ** variáveis capítulos
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
 (setq skip-start-chapters '("Cover" "Title Page" "Copyright"
 							"Dedication" "About The Author"
 							"Foreword" "Preface" "Contents"))
@@ -14,12 +13,18 @@
 (setq skip-end-chapters '("References" "Index"))
 #+end_src
 
+#+RESULTS:
+| References | Index |
+
 ** variáveis com configurações
 
 #+begin_src emacs-lisp
 ;; default do máximo que ele vai pra dentro no índice
 (setq max-depth 1)
 #+end_src
+
+#+RESULTS:
+: 1
 
 ** pega as variáveis dos pdfs
 ;; TODO certificar que está num modo pdf
@@ -30,13 +35,18 @@
 
 #+begin_src emacs-lisp
 (defun get-total-pages ()
+  (interactive)
   (progn (define-pdf-cache-function number-of-pages)
 		 (setq number-of-pages (pdf-cache-number-of-pages))))
 
 (defun get-outline ()
+  (interactive)
   (progn (define-pdf-cache-function outline)
 		 (setq outline (pdf-cache-outline))))
 #+end_src
+
+#+RESULTS:
+: get-outline
 
 ** outline parse
 
@@ -55,28 +65,50 @@
 		;; TODO arrumar isso daqui e pensar num jeito melhor pra ver isso
 		;; acho que chegar o end chapters seria uma boa
 		"fim")))
-
-
 #+end_src
+
+#+RESULTS:
+: teste
 
 *** teste
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (teste (nth 8 outline))
 (teste (nth 9 outline))
-
-;; exemplo de um pedaço
-;; (((depth . 1) (type . goto-dest) (title . "Chapter 21 - Progressing As A Cognitive Behavior Therapist") (page . 380) (top . 0)))
 #+end_src
+
+#+RESULTS:
 
 *** arruma isso
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 ;; TODO ajeitar isso
 (setq outlineum (mapcar #'teste outline))
 (setq outlineum (remove nil (mapcar #'teste outline)))
 (setq outlineum (remove "fim" outlineum))
 #+end_src
 
+#+RESULTS:
+| Chapter 1 - Introduction To Cognitive Behavior Therapy      |  23 |
+| Chapter 2 - Overview Of Treatment                           |  39 |
+| Chapter 3 - Cognitive Conceptualization                     |  51 |
+| Chapter 4 - The Evaluation Session                          |  68 |
+| Chapter 5 - Structure Of The First Therapy Session          |  81 |
+| Chapter 6 - Behavioral Activation                           | 102 |
+| Chapter 7 - Session 2 And Beyond: Structure And Format      | 122 |
+| Chapter 8 - Problems With Structuring The Therapy Session   | 145 |
+| Chapter 9 - Identifying Automatic Thoughts                  | 159 |
+| Chapter 10 - Identifying Emotions                           | 180 |
+| Chapter 11 - Evaluating Automatic Thoughts                  | 189 |
+| Chapter 12 - Responding To Automatic Thoughts               | 209 |
+| Chapter 13 - Identifying And Modifying Intermediate Beliefs | 220 |
+| Chapter 14 - Identifying And Modifying Core Beliefs         | 250 |
+| Chapter 15 - Additional Cognitive And Behavioral Techniques | 278 |
+| Chapter 16 - Imagery                                        | 299 |
+| Chapter 17 - Homework                                       | 316 |
+| Chapter 18 - Termination And Relapse Prevention             | 338 |
+| Chapter 19 - Treatment Planning                             | 354 |
+| Chapter 20 - Problems In Therapy                            | 368 |
+| Chapter 21 - Progressing As A Cognitive Behavior Therapist  | 380 |
 
 ** pega o total de páginas por capítulo
 
@@ -93,9 +125,10 @@
 															number-of-pages)
 										  (car (cdr (car outl))))) ;; first element page number
 								 acc))))
-
-;; (("Chapter 21 - Progressing As A Cognitive Behavior Therapist" 34) ("Chapter 20 - Problems In Therapy" 12) ("Chapter 19 - Treatment Planning" 14) ("Chapter 18 - Termination And Relapse Prevention" 16) ("Chapter 17 - Homework" 22) ("Chapter 16 - Imagery" 17) ("Chapter 15 - Additional Cognitive And Behavioral Techniques" 21) ("Chapter 14 - Identifying And Modifying Core Beliefs" 28) ("Chapter 13 - Identifying And Modifying Intermediate Beliefs" 30) ("Chapter 12 - Responding To Automatic Thoughts" 11) ("Chapter 11 - Evaluating Automatic Thoughts" 20) ("Chapter 10 - Identifying Emotions" 9) ("Chapter 9 - Identifying Automatic Thoughts" 21) ("Chapter 8 - Problems With Structuring The Therapy Session" 14) ("Chapter 7 - Session 2 And Beyond: Structure And Format" 23) ("Chapter 6 - Behavioral Activation" 20) ("Chapter 5 - Structure Of The First Therapy Session" 21) ("Chapter 4 - The Evaluation Session" 13) ("Chapter 3 - Cognitive Conceptualization" 17) ("Chapter 2 - Overview Of Treatment" 12) ("Chapter 1 - Introduction To Cognitive Behavior Therapy" 16))
 #+end_src
+
+#+RESULTS:
+: get-total-per-chapter
 
 *** seq
 
@@ -103,41 +136,68 @@
 (setq outlinedois (reverse (get-total-per-chapter outlineum '())))
 #+end_src
 
-** pega o tempo das coisas
+#+RESULTS:
+| Chapter 1 - Introduction To Cognitive Behavior Therapy      | 16 |
+| Chapter 2 - Overview Of Treatment                           | 12 |
+| Chapter 3 - Cognitive Conceptualization                     | 17 |
+| Chapter 4 - The Evaluation Session                          | 13 |
+| Chapter 5 - Structure Of The First Therapy Session          | 21 |
+| Chapter 6 - Behavioral Activation                           | 20 |
+| Chapter 7 - Session 2 And Beyond: Structure And Format      | 23 |
+| Chapter 8 - Problems With Structuring The Therapy Session   | 14 |
+| Chapter 9 - Identifying Automatic Thoughts                  | 21 |
+| Chapter 10 - Identifying Emotions                           |  9 |
+| Chapter 11 - Evaluating Automatic Thoughts                  | 20 |
+| Chapter 12 - Responding To Automatic Thoughts               | 11 |
+| Chapter 13 - Identifying And Modifying Intermediate Beliefs | 30 |
+| Chapter 14 - Identifying And Modifying Core Beliefs         | 28 |
+| Chapter 15 - Additional Cognitive And Behavioral Techniques | 21 |
+| Chapter 16 - Imagery                                        | 17 |
+| Chapter 17 - Homework                                       | 22 |
+| Chapter 18 - Termination And Relapse Prevention             | 16 |
+| Chapter 19 - Treatment Planning                             | 14 |
+| Chapter 20 - Problems In Therapy                            | 12 |
+| Chapter 21 - Progressing As A Cognitive Behavior Therapist  | 34 |
+
+** PRA FAZER pega o tempo das coisas
 #+begin_src emacs-lisp
-;; TODO FAZER O BÁSICO PRIMEIRO
-(setq pdf-time-before 0)
-(setq pdf-time-after 0)
-;; TODO adicionar uma função para chamar isso
-(add-hook 'pdf-view-after-change-page-hook
-		  (lambda () (progn (set-pdf-time-after)
-					   (message (int-to-string (- pdf-time-after pdf-time-before)))
-					   (set-pdf-time-before))))
+;TODO: colocar um hook pra quando abrir o arquivo pdf ele pegar o tempo
+(add-hook 'pdf-view-mode-hook
+		  (lambda () (progn (setq pdf-time-before (current-time))
+					   (setq pdf-time-after 0))))
+
 
 (defun set-pdf-time-after ()
-  (setq pdf-time-after (hhmmtomm
-						(car (split-string
-							  (substring-no-properties display-time-string)
-							  " ")))))
+  (setq pdf-time-after (current-time)))
 
 (defun set-pdf-time-before ()
-  (setq pdf-time-before (hhmmtomm
-						 (car (split-string
-							   (substring-no-properties display-time-string)
-							   " ")))))
+  (setq pdf-time-before (current-time)))
 
+(defun testesss ()
+  (progn (set-pdf-time-after)
+		 ;; TODO: trocar a função message por alguma outra para mandar para uma base de dados
+		 (message (number-to-string (time-to-seconds (time-subtract (current-time) pdf-time-before))))
+		 ;; TODO: adicinar uma mensagem do tempo restante no capítulo ou livro
+		 (set-pdf-time-before)))
+
+(add-hook 'pdf-view-after-change-page-hook
+		  testesss)
+
+(setq pdf-time-pages '())
 ;; TODO uma função que checa se avançamos nas páginas
 (defun pdf-check-page-advance ()
   (interactive)
   "checks if we are going forward on non-read pages"
-  (if (not (member (pdf-view-current-page) pdf-time-pages))
-	  (setq pdf-time-pages (append (pdf-view-current-page)))))
+	  (add-to-list 'pdf-time-pages (pdf-view-current-page)))
 
 (setq page-rate 3)
 ;; TODO uma função que conta o tempo numa página
 ;; TODO uma outra função que estima o tempo final
 ;; TODO uma função que pega a última página como algo arbitrário para remover índices no final
 #+end_src
+
+#+RESULTS:
+: 3
 
 ** aplica o tempo nos capítulo
 
@@ -147,8 +207,6 @@
   (list (car outline)
 		(* page-rate (car (cdr outline)))))
 
-(mapcar* #'get-chapters-time outlinedois)
-
-;; (("Chapter 1 - Introduction To Cognitive Behavior Therapy" 48) ("Chapter 2 - Overview Of Treatment" 36) ("Chapter 3 - Cognitive Conceptualization" 51) ("Chapter 4 - The Evaluation Session" 39) ("Chapter 5 - Structure Of The First Therapy Session" 63) ("Chapter 6 - Behavioral Activation" 60) ("Chapter 7 - Session 2 And Beyond: Structure And Format" 69) ("Chapter 8 - Problems With Structuring The Therapy Session" 42) ("Chapter 9 - Identifying Automatic Thoughts" 63) ("Chapter 10 - Identifying Emotions" 27) ("Chapter 11 - Evaluating Automatic Thoughts" 60) ("Chapter 12 - Responding To Automatic Thoughts" 33) ("Chapter 13 - Identifying And Modifying Intermediate Beliefs" 90) ("Chapter 14 - Identifying And Modifying Core Beliefs" 84) ("Chapter 15 - Additional Cognitive And Behavioral Techniques" 63) ("Chapter 16 - Imagery" 51) ("Chapter 17 - Homework" 66) ("Chapter 18 - Termination And Relapse Prevention" 48) ("Chapter 19 - Treatment Planning" 42) ("Chapter 20 - Problems In Therapy" 36) ("Chapter 21 - Progressing As A Cognitive Behavior Therapist" 102))
+(mapcar #'get-chapters-time outlinedois)
 #+end_src
 

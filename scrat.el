@@ -1,32 +1,21 @@
-;; TODO colocar os domínios das funções
-;; TODO arrumar as docstrings
-;; TODO colocar um esquema para marcar com o org-noter
-(define-pdf-cache-function number-of-pages)
-(define-pdf-cache-function outline)
-(pdf-cache-outline)
-
-;; TODO certificar que está num modo pdf
-;; nesta função e na get-outline
-(defun get-total-pages ()
-  (progn (define-pdf-cache-function number-of-pages)
-		 (setq number-of-pages (pdf-cache-number-of-pages))))
-;; roda essa função no modo de pdf
-;; TODO checa se existe outline
-(defun get-outline ()
-  (progn (define-pdf-cache-function outline)
-		 (setq outline (pdf-cache-outline))))
-
 (setq skip-start-chapters '("Cover" "Title Page" "Copyright"
 							"Dedication" "About The Author"
 							"Foreword" "Preface" "Contents"))
 
 (setq skip-end-chapters '("References" "Index"))
-	   
-;; exemplo de um pedaço
-;; (((depth . 1) (type . goto-dest) (title . "Chapter 21 - Progressing As A Cognitive Behavior Therapist") (page . 380) (top . 0)))
 
 ;; default do máximo que ele vai pra dentro no índice
 (setq max-depth 1)
+
+(defun get-total-pages ()
+  (interactive)
+  (progn (define-pdf-cache-function number-of-pages)
+		 (setq number-of-pages (pdf-cache-number-of-pages))))
+
+(defun get-outline ()
+  (interactive)
+  (progn (define-pdf-cache-function outline)
+		 (setq outline (pdf-cache-outline))))
 
 (defun teste (outline)
   "função que pega uma entrada do outline e retorna o nome e o número da página"
@@ -56,55 +45,45 @@
 										  (car (cdr (car outl))))) ;; first element page number
 								 acc))))
 
+;; (setq outlinedois (reverse (get-total-per-chapter outlineum '())))
+
+;TODO: colocar um hook pra quando abrir o arquivo pdf ele pegar o tempo
+(add-hook 'pdf-view-mode-hook
+		  (lambda () (progn (setq pdf-time-before (current-time))
+					   (setq pdf-time-after 0))))
+
+
+(defun set-pdf-time-after ()
+  (setq pdf-time-after (current-time)))
+
+(defun set-pdf-time-before ()
+  (setq pdf-time-before (current-time)))
+;; TODO: trocar a função message por alguma outra para mandar para uma base de dados
+
+(defun testesss ()
+  (progn (set-pdf-time-after)
+		 (message (number-to-string (time-to-seconds (time-subtract (current-time) pdf-time-before))))
+		 ;; TODO: adicinar uma mensagem do tempo restante no capítulo ou livro
+		 (set-pdf-time-before)))
+;; TODO adicionar uma função para chamar isso
+(add-hook 'pdf-view-after-change-page-hook
+		  'testesss)
+
+(setq pdf-time-pages '())
+;; TODO uma função que checa se avançamos nas páginas
+(defun pdf-check-page-advance ()
+  (interactive)
+  "checks if we are going forward on non-read pages"
+	  (add-to-list 'pdf-time-pages (pdf-view-current-page)))
+
 (setq page-rate 3)
-;; TODO ajeitar isso
-(setq outlineum (mapcar #'teste outline))
-(setq outlineum (remove nil (mapcar #'teste outline)))
-(setq outlineum (remove "fim" outlineum))
-(setq outlinedois (reverse (get-total-per-chapter outlineum '())))
-
-
-;; (("Chapter 21 - Progressing As A Cognitive Behavior Therapist" 34) ("Chapter 20 - Problems In Therapy" 12) ("Chapter 19 - Treatment Planning" 14) ("Chapter 18 - Termination And Relapse Prevention" 16) ("Chapter 17 - Homework" 22) ("Chapter 16 - Imagery" 17) ("Chapter 15 - Additional Cognitive And Behavioral Techniques" 21) ("Chapter 14 - Identifying And Modifying Core Beliefs" 28) ("Chapter 13 - Identifying And Modifying Intermediate Beliefs" 30) ("Chapter 12 - Responding To Automatic Thoughts" 11) ("Chapter 11 - Evaluating Automatic Thoughts" 20) ("Chapter 10 - Identifying Emotions" 9) ("Chapter 9 - Identifying Automatic Thoughts" 21) ("Chapter 8 - Problems With Structuring The Therapy Session" 14) ("Chapter 7 - Session 2 And Beyond: Structure And Format" 23) ("Chapter 6 - Behavioral Activation" 20) ("Chapter 5 - Structure Of The First Therapy Session" 21) ("Chapter 4 - The Evaluation Session" 13) ("Chapter 3 - Cognitive Conceptualization" 17) ("Chapter 2 - Overview Of Treatment" 12) ("Chapter 1 - Introduction To Cognitive Behavior Therapy" 16))
+;; TODO uma função que conta o tempo numa página
+;; TODO uma outra função que estima o tempo final
+;; TODO uma função que pega a última página como algo arbitrário para remover índices no final
 
 (defun get-chapters-time (outline)
   "Function that gets the OUTLINE rate and apply it to the time."
   (list (car outline)
 		(* page-rate (car (cdr outline)))))
 
-(mapcar* #'get-chapters-time outlinedois)
-
-;; (("Chapter 1 - Introduction To Cognitive Behavior Therapy" 48) ("Chapter 2 - Overview Of Treatment" 36) ("Chapter 3 - Cognitive Conceptualization" 51) ("Chapter 4 - The Evaluation Session" 39) ("Chapter 5 - Structure Of The First Therapy Session" 63) ("Chapter 6 - Behavioral Activation" 60) ("Chapter 7 - Session 2 And Beyond: Structure And Format" 69) ("Chapter 8 - Problems With Structuring The Therapy Session" 42) ("Chapter 9 - Identifying Automatic Thoughts" 63) ("Chapter 10 - Identifying Emotions" 27) ("Chapter 11 - Evaluating Automatic Thoughts" 60) ("Chapter 12 - Responding To Automatic Thoughts" 33) ("Chapter 13 - Identifying And Modifying Intermediate Beliefs" 90) ("Chapter 14 - Identifying And Modifying Core Beliefs" 84) ("Chapter 15 - Additional Cognitive And Behavioral Techniques" 63) ("Chapter 16 - Imagery" 51) ("Chapter 17 - Homework" 66) ("Chapter 18 - Termination And Relapse Prevention" 48) ("Chapter 19 - Treatment Planning" 42) ("Chapter 20 - Problems In Therapy" 36) ("Chapter 21 - Progressing As A Cognitive Behavior Therapist" 102))
-
-(teste (nth 8 outline))
-(teste (nth 9 outline))
-
-;; TODO FAZER O BÁSICO PRIMEIRO
-(setq pdf-time-before 0)
-(setq pdf-time-after 0)
-;; TODO adicionar uma função para chamar isso
-(add-hook 'pdf-view-after-change-page-hook
-		  (lambda () (progn (set-pdf-time-after)
-					   (message (int-to-string (- pdf-time-after pdf-time-before)))
-					   (set-pdf-time-before))))
-
-(defun set-pdf-time-after ()
-  (setq pdf-time-after (hhmmtomm
-						(car (split-string
-							  (substring-no-properties display-time-string)
-							  " ")))))
-
-(defun set-pdf-time-before ()
-  (setq pdf-time-before (hhmmtomm
-						 (car (split-string
-							   (substring-no-properties display-time-string)
-							   " ")))))
-
-;; TODO uma função que checa se avançamos nas páginas
-(defun pdf-check-page-advance ()
-  (interactive)
-  "checks if we are going forward on non-read pages"
-  (if (not (member (pdf-view-current-page) pdf-time-pages))
-	  (setq pdf-time-pages (append (pdf-view-current-page)))))
-;; TODO uma função que conta o tempo numa página
-;; TODO uma outra função que estima o tempo final
-;; TODO uma função que pega a última página como algo arbitrário para remover índices no final
+;; (mapcar #'get-chapters-time outlinedois)
