@@ -45,39 +45,43 @@
 										  (car (cdr (car outl))))) ;; first element page number
 								 acc))))
 
-;; (setq outlinedois (reverse (get-total-per-chapter outlineum '())))
+(setq outlinedois (reverse (get-total-per-chapter outlineum '())))
 
 ;TODO: colocar um hook pra quando abrir o arquivo pdf ele pegar o tempo
-(add-hook 'pdf-view-mode-hook
-		  (lambda () (progn (setq pdf-time-before (current-time))
-					   (setq pdf-time-after 0))))
-
-
-(defun set-pdf-time-after ()
-  (setq pdf-time-after (current-time)))
+(add-hook 'pdf-view-mode-hook #'set-pdf-time-before)
 
 (defun set-pdf-time-before ()
   (setq pdf-time-before (current-time)))
-;; TODO: trocar a função message por alguma outra para mandar para uma base de dados
 
-(defun testesss ()
-  (progn (set-pdf-time-after)
-		 (message (number-to-string (time-to-seconds (time-subtract (current-time) pdf-time-before))))
-		 ;; TODO: adicinar uma mensagem do tempo restante no capítulo ou livro
-		 (set-pdf-time-before)))
-;; TODO adicionar uma função para chamar isso
-(add-hook 'pdf-view-after-change-page-hook
-		  'testesss)
+(setq threshold 6)
+
+(setq total-time 0)
 
 (setq pdf-time-pages '())
-;; TODO uma função que checa se avançamos nas páginas
+
+(setq page-rate 1)
+
+(length pdf-time-pages)
+
 (defun pdf-check-page-advance ()
   (interactive)
   "checks if we are going forward on non-read pages"
-	  (add-to-list 'pdf-time-pages (pdf-view-current-page)))
+;;  TODO vai bugar, depois preciso ver alguma solução melhor pra isso
+  (add-to-list 'pdf-time-pages (1- (pdf-view-current-page))))
 
-(setq page-rate 3)
-;; TODO uma função que conta o tempo numa página
+(defun testesss ()
+  (let ((seconds-in-previous-page (time-to-seconds (time-subtract (current-time) pdf-time-before))))
+	(progn (if (> seconds-in-previous-page threshold)
+			   (progn (pdf-check-page-advance)
+					  (setq total-time (+ total-time seconds-in-previous-page)
+							page-rate (/ total-time (length pdf-time-pages)))
+					  (message (format "%f total time and %f average page time" total-time page-rate))))
+		   (setq pdf-time-before (current-time)))))
+
+(add-hook 'pdf-view-after-change-page-hook #'testesss)
+
+;; TODO uma função que checa se avançamos nas páginas
+
 ;; TODO uma outra função que estima o tempo final
 ;; TODO uma função que pega a última página como algo arbitrário para remover índices no final
 
@@ -86,4 +90,4 @@
   (list (car outline)
 		(* page-rate (car (cdr outline)))))
 
-;; (mapcar #'get-chapters-time outlinedois)
+(mapcar #'get-chapters-time outlinedois)
